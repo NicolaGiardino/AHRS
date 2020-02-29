@@ -59,10 +59,10 @@ void setKalman(){
     k->A=*constructor(2,2);
     k->S=*constructor(2,2);
     
-    k->x=*constructor(2,1);
-    k->x_p=*constructor(2,1);
-    k->y=*constructor(2,1);
-    k->B=*constructor(2,1);
+    k->x=*constructor(1,2);
+    k->x_p=*constructor(1,2);
+    k->y=*constructor(1,2);
+    k->B=*constructor(1,2);
     
     //setting the North Kalman
     k[0].dt=0.001;                                                                                                  //set Dt
@@ -125,14 +125,14 @@ Matrix *calc_acc_vec(Matrix *a, const float offsetx, const float offsety){
     Matrix *acc=constructor(3, 1);
     Matrix rotation=*constructor(3, 3);
     
-    /*normalize the quaternion
+    //normalize the quaternion
     float n;
     n=invSqrt(q[0]*q[0]+q[1]*q[1]+q[2]*q[2]+q[3]*q[3]);
     q[0]*=n;
     q[1]*=n;
     q[2]*=n;
     q[3]*=n;
-    */
+    
     
     //calculating rotation matrix
     rotation.numbers[0][0] = q0*q0 + q1*q1 - q2*q2 - q3*q3;
@@ -154,9 +154,9 @@ Matrix *calc_acc_vec(Matrix *a, const float offsetx, const float offsety){
     printf("\n");
     
     
-    /*rotating vector to get accN and accE
+    //rotating vector to get accN and accE
     acc.numbers[0]-=offsetx;
-    acc.numbers[1]-=offsety;*/
+    acc.numbers[1]-=offsety;
     
     return acc;
 }

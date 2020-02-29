@@ -26,7 +26,7 @@
 #include <stdio.h>
 #include "MadgwickAHRS.h"
 #include "Kalman.h"
-#include "GPS_Library.c"
+#include "GPS_Library.h"
 
 
 /*===========================================================================*/

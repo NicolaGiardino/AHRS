@@ -39,7 +39,7 @@ k->B=*constructor(1,2);
 
 
 /*====================================*/
-/* Predict state                      */
+/* Prediction state                   */
 /*====================================*/
 void predict(kalman *k, float u){
     

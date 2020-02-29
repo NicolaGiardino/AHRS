@@ -22,7 +22,7 @@ void stringcpy(char *str1, char *str2, int dir) {
 }
 
 
-int GPSRead(uint8_t c) {//there it goes the read from UART for GPS, ChibiOS function to be set
+int GPSRead(uint8_t c) {//there goes the read from UART for GPS, ChibiOS function to be set
 
   switch(c) {
     case '\r':  // sentence end
