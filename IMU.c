@@ -125,13 +125,14 @@ Matrix *calc_acc_vec(Matrix *a, const float offsetx, const float offsety){
     Matrix *acc=constructor(3, 1);
     Matrix rotation=*constructor(3, 3);
     
-    //normalize the quaternion
+    /*normalize the quaternion
     float n;
     n=invSqrt(q[0]*q[0]+q[1]*q[1]+q[2]*q[2]+q[3]*q[3]);
     q[0]*=n;
     q[1]*=n;
     q[2]*=n;
     q[3]*=n;
+    Already normalized*/
     
     
     //calculating rotation matrix
@@ -149,14 +150,12 @@ Matrix *calc_acc_vec(Matrix *a, const float offsetx, const float offsety){
     //calculating acceleration vector
     //rotation*g=acc;       inverse rotation;       invrot*acc=a;
     
-    acc=multiply(inversion(&rotation), a);
-    print(acc);
-    printf("\n");
+    acc=multiply(inverse(&rotation), a);
     
     
     //rotating vector to get accN and accE
-    acc.numbers[0]-=offsetx;
-    acc.numbers[1]-=offsety;
+    acc->numbers[0]-=offsetx;
+    acc->numbers[1]-=offsety;
     
     return acc;
 }

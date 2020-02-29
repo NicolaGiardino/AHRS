@@ -45,13 +45,13 @@ void predict(kalman *k, float u){
     
     //x_p=A*x(n-1) + u_k*b
     k->x_p=*multiply(&k->A, &k->x);
-    scalar_multiply(&k->B, u);
-    add(&k->x_p, &k->B);
+    sc_multiply(&k->B, u);
+    sum(&k->x_p, &k->B);
     
     //P_p=A*P_n-1*A^T + Q
     k->P_p=*multiply(&k->A, &k->P);
     k->P_p=*multiply(&k->P_p, transpose(&k->A));
-    add(&k->P_p, &k->Q);
+    sum(&k->P_p, &k->Q);
     
 }
 
@@ -67,7 +67,7 @@ void innovation(kalman *k, Matrix *z){//y gps data, z[1][2]
     //S=H*P_p*H_T + R
     k->S=*multiply(&k->H, &k->P_p);
     k->S=*multiply(&k->S, transpose(&k->H));
-    add(&k->S, &k->R);
+    sum(&k->S, &k->R);
     
     //K=P_p*H_T*S^-1
     k->K=*multiply(&k->P_p, transpose(&k->H));
@@ -82,7 +82,7 @@ void update(kalman *k){
     Matrix I=*identity(2);
     //x_n=x_p+Ky
     add(&k->x_p, multiply(&k->K, &k->y));
-    k->x=*clone(&k->x_p);
+    k->x=*copy(&k->x_p);
     
     //P=(I-K*H)*P_p
     subtract(&I, multiply(&k->K, &k->H));

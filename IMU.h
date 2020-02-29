@@ -24,6 +24,8 @@
 #define IMU_h
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
 #include "MadgwickAHRS.h"
 #include "Kalman.h"
 #include "GPS_Library.h"
