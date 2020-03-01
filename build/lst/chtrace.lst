@@ -1,0 +1,103 @@
+ARM GAS  /var/folders/45/ct_yb_0s4l984dg097s5d1mh0000gp/T//ccH1VtTZ.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.eabi_attribute 20, 1
+   3              		.eabi_attribute 21, 1
+   4              		.eabi_attribute 23, 3
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 2
+   9              		.eabi_attribute 34, 1
+  10              		.eabi_attribute 18, 4
+  11              		.file	"chtrace.c"
+  12              		.section	.gnu.lto_.profile.d374b07cca8884c6,"",%progbits
+  13 0000 789C6363 		.ascii	"x\234cc```\004b\006\000\000D\000\010"
+  13      60606004 
+  13      62060000 
+  13      440008
+  14              		.text
+  15              		.section	.gnu.lto_.icf.d374b07cca8884c6,"",%progbits
+  16 0000 789C6363 		.ascii	"x\234cc```b@\006\000\000\232\000\011"
+  16      60606062 
+  16      40060000 
+  16      9A0009
+  17              		.text
+  18              		.section	.gnu.lto_.inline.d374b07cca8884c6,"",%progbits
+  19 0000 789C6363 		.ascii	"x\234cc```b@\006\000\000\232\000\011"
+  19      60606062 
+  19      40060000 
+  19      9A0009
+  20              		.text
+  21              		.section	.gnu.lto_.pureconst.d374b07cca8884c6,"",%progbits
+  22 0000 789C6363 		.ascii	"x\234cc```\004b\006\000\000D\000\010"
+  22      60606004 
+  22      62060000 
+  22      440008
+  23              		.text
+  24              		.section	.gnu.lto_.symbol_nodes.d374b07cca8884c6,"",%progbits
+  25 0000 789C6363 		.ascii	"x\234cc```b\000\001\000\000R\000\011"
+  25      60606062 
+  25      00010000 
+  25      520009
+  26              		.text
+  27              		.section	.gnu.lto_.refs.d374b07cca8884c6,"",%progbits
+  28 0000 789C6363 		.ascii	"x\234cc```\004b\006\000\000D\000\010"
+  28      60606004 
+  28      62060000 
+  28      440008
+  29              		.text
+  30              		.section	.gnu.lto_.decls.d374b07cca8884c6,"",%progbits
+  31 0000 789C6363 		.ascii	"x\234cc\200\000F V\001\342\377@\000b\037d \000\000\276"
+  31      80004620 
+  31      5601E2FF 
+  31      4000621F 
+  31      64200000 
+  32 0015 7C04EA   		.ascii	"|\004\352"
+  33              		.text
+  34              		.section	.gnu.lto_.symtab.d374b07cca8884c6,"",%progbits
+  35              		.text
+ARM GAS  /var/folders/45/ct_yb_0s4l984dg097s5d1mh0000gp/T//ccH1VtTZ.s 			page 2
+
+
+  36              		.section	.gnu.lto_.opts,"",%progbits
+  37 0000 272D666D 		.ascii	"'-fmath-errno' '-fsigned-zeros' '-ftrapping-math' '"
+  37      6174682D 
+  37      6572726E 
+  37      6F272027 
+  37      2D667369 
+  38 0033 2D666E6F 		.ascii	"-fno-trapv' '-fno-openmp' '-fno-openacc' '-mcpu=cor"
+  38      2D747261 
+  38      70762720 
+  38      272D666E 
+  38      6F2D6F70 
+  39 0066 7465782D 		.ascii	"tex-m7' '-mno-thumb-interwork' '-mthumb' '-O2' '-fo"
+  39      6D372720 
+  39      272D6D6E 
+  39      6F2D7468 
+  39      756D622D 
+  40 0099 6D69742D 		.ascii	"mit-frame-pointer' '-falign-functions=16' '-ffuncti"
+  40      6672616D 
+  40      652D706F 
+  40      696E7465 
+  40      72272027 
+  41 00cc 6F6E2D73 		.ascii	"on-sections' '-fdata-sections' '-fno-common' '-flto"
+  41      65637469 
+  41      6F6E7327 
+  41      20272D66 
+  41      64617461 
+  42 00ff 2700     		.ascii	"'\000"
+  43              		.text
+  44              		.comm	__gnu_lto_v1,1,1
+  45              		.comm	__gnu_lto_slim,1,1
+  46              		.ident	"GCC: (GNU Tools for Arm Embedded Processors 7-2018-q2-update) 7.3.1 20180622 (release) [AR
+ARM GAS  /var/folders/45/ct_yb_0s4l984dg097s5d1mh0000gp/T//ccH1VtTZ.s 			page 3
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 chtrace.c
+                            *COM*:0000000000000001 __gnu_lto_v1
+                            *COM*:0000000000000001 __gnu_lto_slim
+
+NO UNDEFINED SYMBOLS

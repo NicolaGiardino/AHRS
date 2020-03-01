@@ -1,18 +1,8 @@
+// GPS Library for CCS PIC C compiler
+// http://simple-circuit.com/
 
+#include "GPS_Lib.h"
 
-#define _GPRMC_  1
-#define _GPGGA_  2
-#define _OTHER_  3
-
-#include <stdint.h>
-#include <stdlib.h>
-#include <string.h>
-
-
-int GPRMC_ok = 0, GPGGA_ok = 0;
-uint8_t char_number = 0, SentenceType = 0, Term;
-char sentence[6], rawTime[11], rawDate[7], rawSpeed[6], rawCourse[6], rawSatellites[3],
-     rawLatitude[13], rawLongitude[13], rawAltitude[7], buffer[12];
 
 void stringcpy(char *str1, char *str2, int dir) {
   uint8_t chr = 0;
@@ -22,7 +12,7 @@ void stringcpy(char *str1, char *str2, int dir) {
 }
 
 
-int GPSRead(uint8_t c) {//there goes the read from UART for GPS, ChibiOS function to be set
+int GPSRead(uint8_t c) {
 
   switch(c) {
     case '\r':  // sentence end
