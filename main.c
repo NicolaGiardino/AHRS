@@ -1,30 +1,26 @@
 /******************************************************************/
-/*                                                                */
-/*        ____ ___      .__                                       */
-/*       |    |   \____ |__| ____ _____                           */
-/*       |    |   /    \|  |/    \\__  \                          */
-/*       |    |  /   |  \  |   |  \/ __ \_                        */
-/*       |______/|___|  /__|___|  (____  /                        */
-/*                    \/        \/     \/                         */
-/*       ___________         ___________                          */
-/*       \_   _____/         \__    ___/___ _____    _____        */
-/*        |    __)_   ______   |    |_/ __ \\__  \  /     \       */
-/*        |        \ /_____/   |    |\  ___/ / __ \|  Y Y  \      */
-/*       /_______  /           |____| \___  >____  /__|_|  /      */
-/*               \/                       \/     \/      \/       */
-/*             								                      */
+//This file is part of The AHRS Project.
+//
+//Copyright © 2019 By Nicola di Gruttola Giardino. All rights reserved.
+//@mail: nicoladgg@protonmail.com
+//
+//AHRS is free software: you can redistribute it and/or modify
+//it under the terms of the GNU General Public License as published by
+//the Free Software Foundation, either version 3 of the License, or
+//(at your option) any later version.
+//
+//AHRS is distributed in the hope that it will be useful,
+//but WITHOUT ANY WARRANTY; without even the implied warranty of
+//MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//GNU General Public License for more details.
+//
+//You should have received a copy of the GNU General Public License
+//along with The AHRS Project.  If not, see <https://www.gnu.org/licenses/>.
+//
+//In case of use of this project, I ask you to mention me, to whom it may concern.
 /******************************************************************/
 
-/**
-* @name:    main.c
-* @uses:    Main F7
-* @date:    11/07/2019
-* @author:  Laura Cimmino
-* @author:  Giuseppe De Rosa
-* @author:	Nicola di Gruttola Giardino
-* @author:	Antonio Emmanuele
-* @version: 1.0
-*/
+
 #include "ch.h"
 #include "hal.h"
 #include "rt_test_root.h"
@@ -34,7 +30,7 @@
 #include "usrlib/GPS_Lib.h"
 /*
  *=============================================================================*
- *                              VARIABles
+ *                              VARIABLES
  *=============================================================================*
  */
 #define SPI_BUFFERS_SIZE  51 //DIMENSIONS BUFFER
@@ -45,25 +41,20 @@
 #define cls(chp)  chprintf(chp, "\033[2J\033[1;1H")
 #define GPSREADY 1
 #define GPSNOTREADY 0
-
+#define idYPR 0x12
+#define idSPD 0x13
 
 static BaseSequentialStream* chp = (BaseSequentialStream*)&SD3;
-//Variabile PWM
 static int temp_error=0;
 static uint8_t rxbuf[SPI_BUFFERS_SIZE];
-//Assegnazione puntatori Thread
-//thread_t* CAN_RX;
-//thread_t* CAN_TX;
-//thread_t* SPIIMU;
-//thread_t* UARTGPS;
 
 static int Release_Thread=0;
 
 
 int index;
 //Exit messages
-static int ERROR_THREAD = 403;
-static int OK = 200;
+static int ERROR_THREAD = -1;
+static int OK = 0;
 
 static int SLEEP_MS = 500;
 
@@ -136,37 +127,6 @@ static UARTConfig uart_cfg={
 
 /*
  * ************************************************************************* *
- *                              THREAD CAN RX
- * ************************************************************************* *
- */
-static THD_WORKING_AREA(can_rx_wa, 256);
-static THD_FUNCTION(can_rx, p) {
-  struct can_instance *cip = p;
-  //event_listener_t el;
-  (void)p;
-  chRegSetThreadName("Receiver");
-  CANRxFrame rxmsg;
-  char temp_buffer[5];
-  char temp_buffer1[5];
-  while(true){
-    msg_t Mine=canReceive(cip->canp, CAN_ANY_MAILBOX, &rxmsg, TIME_IMMEDIATE);
-    if(Mine==MSG_OK){
-      palSetLine(LINE_LED1);
-      chThdSleepMilliseconds(500);
-      palClearLine(LINE_LED1);
-      chThdSleepMilliseconds(500);
-      unpackage(rxmsg.data32[0], temp_buffer);
-
-      chprintf(chp, "\trxmsg.DATA32[1] : %02x \n\r", rxmsg.data32[1]);
-    }
-    chThdSleepMilliseconds(SLEEP_MS);
-  }
-  if (Release_Thread) chThdExit((msg_t)OK);
-  else chThdExit((msg_t)ERROR_THREAD);
-}
-
-/*
- * ************************************************************************* *
  *                              THREAD CAN TX
  * ************************************************************************* *
  */
@@ -175,16 +135,27 @@ static THD_FUNCTION(can_tx, p) {
   (void)p;
   CANTxFrame txmsg;
   chRegSetThreadName("Transmitter");
-  txmsg.IDE = CAN_IDE_EXT;
-  txmsg.EID = 0x01234567;
-  txmsg.RTR = CAN_RTR_DATA;
-  txmsg.DLC = 8;
-  txmsg.data32[0] = 0x55AA55AA;
-  txmsg.data32[1] = 0x00FF00FF;
 
   while (true) {
-    canTransmit(&CAND1, CAN_ANY_MAILBOX, &txmsg, TIME_MS2I(100));
-    chThdSleepMilliseconds(SLEEP_MS);
+	txmsg.IDE = CAN_IDE_EXT;
+ 	txmsg.EID = idYPR;
+ 	txmsg.RTR = CAN_RTR_DATA;
+ 	txmsg.DLC = 6;
+ 	txmsg.data16[0] = (int)(YPR[0]*100);
+	txmsg.data16[1] = (int)(YPR[1]*100);
+	txmsg.data16[2] = (int)(YPR[2]*100);
+    	canTransmit(&CAND1, CAN_ANY_MAILBOX, &txmsg, TIME_MS2I(100));
+    	chThdSleepMilliseconds(SLEEP_MS);
+
+	txmsg.IDE = CAN_IDE_EXT;
+ 	txmsg.EID = idSPD;
+ 	txmsg.RTR = CAN_RTR_DATA;
+ 	txmsg.DLC = 6;
+ 	txmsg.data16[0] = (int)(v[0]*100);
+	txmsg.data16[1] = (int)(v[1]*100);
+	txmsg.data16[2] = (int)(v[2]*100);
+    	canTransmit(&CAND1, CAN_ANY_MAILBOX, &txmsg, TIME_MS2I(100));
+    	chThdSleepMilliseconds(SLEEP_MS);
   }
   if (Release_Thread) chThdExit((msg_t)OK);
   else chThdExit((msg_t)ERROR_THREAD);
