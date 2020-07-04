@@ -4,7 +4,8 @@
 #include "GPS_Lib.h"
 
 
-void stringcpy(char *str1, char *str2, int dir) {
+void stringcpy(char *str1, char *str2, int dir)
+{
   uint8_t chr = 0;
   do {
     str2[chr + dir] = str1[chr];
@@ -12,7 +13,8 @@ void stringcpy(char *str1, char *str2, int dir) {
 }
 
 
-int GPSRead(uint8_t c) {
+int GPSRead(uint8_t c)
+{
 
   switch(c) {
     case '\r':  // sentence end
@@ -107,27 +109,34 @@ int GPSRead(uint8_t c) {
   return 0;
 }
 
-uint8_t GPSSecond() {
+uint8_t GPSSecond() 
+{
   return ((rawTime[4] - '0') * 10 + (rawTime[5] - '0'));
 }
-uint8_t GPSMinute() {
+uint8_t GPSMinute()
+{
   return ((rawTime[2] - '0') * 10 + (rawTime[3] - '0'));
 }
-uint8_t GPSHour() {
+uint8_t GPSHour() 
+{
   return ((rawTime[0] - '0') * 10 + (rawTime[1] - '0'));
 }
 
-uint8_t GPSDay() {
+uint8_t GPSDay() 
+{
   return ((rawDate[0] - '0') * 10 + (rawDate[1] - '0'));
 }
-uint8_t GPSMonth() {
+uint8_t GPSMonth() 
+{
   return ((rawDate[2] - '0') * 10 + (rawDate[3] - '0'));
 }
-uint8_t GPSyear() {
+uint8_t GPSyear() 
+{
   return ((rawDate[4] - '0') * 10 + (rawDate[5] - '0'));
 }
 
-float parse_rawDegree(char *term_) {
+float parse_rawDegree(char *term_)
+{
   float term_value = atof(term_)/100;
   int16_t term_dec = term_value;
   term_value -= term_dec;
@@ -135,27 +144,33 @@ float parse_rawDegree(char *term_) {
   return term_value;
 }
 
-float Latitude() {
+float Latitude() 
+{
   return parse_rawDegree(rawLatitude);
 }
 
-float Longitude() {
+float Longitude()
+{
   return parse_rawDegree(rawLongitude);
 }
 
-float Altitude() {
+float Altitude()
+{
   return atof(rawAltitude);
 }
 
-uint8_t Satellites() {
+uint8_t Satellites() 
+{
   return atoi(rawSatellites);
 }
 
-float Speed() {
+float Speed() 
+{
   return (atof(rawSpeed) * 1.852);
 }
 
-float Course() {
+float Course() 
+{
   return atof(rawCourse);
 }
 

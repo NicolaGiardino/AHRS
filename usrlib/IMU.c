@@ -1,56 +1,168 @@
-/******************************************************************/
-//This file is part of The AHRS Project.
-//
-//Copyright © 2019 By Nicola di Gruttola Giardino. All rights reserved.
-//@mail: nicoladgg@protonmail.com
-//
-//AHRS is free software: you can redistribute it and/or modify
-//it under the terms of the GNU General Public License as published by
-//the Free Software Foundation, either version 3 of the License, or
-//(at your option) any later version.
-//
-//AHRS is distributed in the hope that it will be useful,
-//but WITHOUT ANY WARRANTY; without even the implied warranty of
-//MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//GNU General Public License for more details.
-//
-//You should have received a copy of the GNU General Public License
-//along with The AHRS Project.  If not, see <https://www.gnu.org/licenses/>.
-//
-//In case of use of this project, I ask you to mention me, to whom it may concern.
-/******************************************************************/
+/***********************************************************************************
+* This file is part of The AHRS Project.                                           *
+*                                                                                  *
+* Copyright © 2020 By Nicola di Gruttola Giardino. All rights reserved.            *
+* @mail: nicoladgg@protonmail.com                                                  *
+*                                                                                  *
+* AHRS is free software: you can redistribute it and/or modify                     *
+* it under the terms of the GNU General Public License as published by             *
+* the Free Software Foundation, either version 3 of the License, or                *
+* (at your option) any later version.                                              *
+*                                                                                  *
+* AHRS is distributed in the hope that it will be useful,                          *
+* but WITHOUT ANY WARRANTY; without even the implied warranty of                   *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                    *
+* GNU General Public License for more details.                                     *
+*                                                                                  *
+* You should have received a copy of the GNU General Public License                *
+* along with The AHRS Project.  If not, see <https://www.gnu.org/licenses/>.       *
+*                                                                                  *
+* In case of use of this project, I ask you to mention me, to whom it may concern. *
+***********************************************************************************/
 
+/****************************************************************************************************
+* FILE NAME: IMU.c                                                                                  *
+*                                                                                                   *
+* PURPOSE: This library gives all the tools to implement the whole AHRS algorithm                   *
+*                                                                                                   *
+* FILE REFERENCES:                                                                                  *
+*                                                                                                   *
+*   Name    I/O     Description                                                                     *
+*   ----    ---     -----------                                                                     *
+*   none                                                                                            *
+*                                                                                                   *
+*                                                                                                   *
+* EXTERNAL VARIABLES:                                                                               *
+*                                                                                                   *
+* Source: <matrix.h>                                                                                *
+*                                                                                                   *
+* Name          Type    IO Description                                                              *
+* ------------- ------- -- -----------------------------                                            *
+*   m               Matrix      Matrix object, contains                                             *
+*                                a float**, being the matrix, and 2 int, being rows and columns     *
+*                                                                                                   *
+* Source: <Kalman.h>                                                                                *
+*                                                                                                   *
+* Name          Type    IO Description                                                              *
+* ------------- ------- -- -----------------------------                                            *
+* kalman      Kalman      Kalman object, contains                                                   *
+*                                all the matrices needed for the Kalman FIlter                      *
+*                                                                                                   *
+*                                                                                                   *
+* GLOABL VARIABLES:                                                                                 *
+*                                                                                                   *
+*   Name       Type       I/O      Description                                                      *
+*   ----       ----       ---      -----------                                                      *
+*   k          Kalman[3]  IO       Kalman structure                                                 *
+*   gravity    float[3]   IO                                                                        *
+*   euler      float[3]   I                                                                         *
+*   last_lla   float[3]   I        Previous long-lat-alt GPS data                                   *
+*   timesexec  int        I                                                                         *
+*                                                                                                   *
+* EXTERNAL REFERENCES:                                                                              *
+*                                                                                                   *
+*  Name                       Description                                                           *
+*  -------------              -----------                                                           *
+*  none                                                                                             *
+*                                                                                                   *
+* ABNORMAL TERMINATION CONDITIONS, ERROR AND WARNING MESSAGES:                                      *
+*    none, compliant with the standard ISO9899:1999                                                 *
+*                                                                                                   *
+* ASSUMPTIONS, CONSTRAINTS, RESTRICTIONS: tbd                                                       *
+*                                                                                                   *
+* NOTES: see documentations                                                                         *
+*                                                                                                   *
+* REQUIREMENTS/FUNCTIONAL SPECIFICATIONS REFERENCES:                                                *
+*                                                                                                   *
+* DEVELOPMENT HISTORY:                                                                              *
+*                                                                                                   *
+*   Date          Author            Change Id     Release     Description Of Change                 *
+*   ----          ------            ---------     ------      ----------------------                *
+*   14-11-2019    N.di Gruttola      1               1         Initial commit                       *
+*                   Giardino                                                                        *
+*   02-03-2020    N. di Gruttola     2               1.1       Modified libraries, added            *
+*                   Giardino                                    my own matrix library               *
+*   04-07-2020    N.di Gruttola                      1.2       Added comments, code satisfies       *
+*                  Giardino                                     iso9899:1999, as requested per      *
+*                                                               MISRA-C:2004                        *
+*                                                                                                   *
+*                                                                                                   *
+*                                                                                                   *
+****************************************************************************************************/
 
 #include "IMU.h"
 
-/*===========================================================================*/
-/* Global variables                                                          */
-/*===========================================================================*/
+/* Global variables */
 
 kalman k[3];
-float gravity[3];
-float euler[3];
-float last_lla[3]={0,0,0}; //latitude longitude altitude
-float lla[3];
-int timesexec=0;
+float  gravity[3];
+float  euler[3];
+float  last_lla[3] ={0,0,0}; //latitude longitude altitude
+float  lla[3];
+int    timesexec   =0;
 
-float degtorad(float deg) {
+
+/********************************************************************************
+*                                                                               *
+* FUNCTION NAME: degtorad                                                       *
+*                                                                               *
+* PURPOSE: Converts degrees to radians                                          *
+*                                                                               *
+* ARGUMENT LIST:                                                                *
+*                                                                               *
+* Argument  Type         IO     Description                                     *
+* --------- --------     --     ---------------------------------               *
+* deg       float        I      degrees                                         *
+*                                                                               *
+* RETURN VALUE: float                                                           *
+*                                                                               *
+********************************************************************************/
+float degtorad(float deg)
+{
     return deg * (M_PI/180);
 }
 
-/*===========================================================================*/
-/* Low-Pass filter, alpha must be 0<alpha<1                                   */
-/*===========================================================================*/
-float LowPassFilter(float prev, float measured, float alpha) {
+
+/********************************************************************************
+*                                                                               *
+* FUNCTION NAME: LowPassFilter                                                  *
+*                                                                               *
+* PURPOSE: Low Pass filter                                                      *
+*                                                                               *
+* ARGUMENT LIST:                                                                *
+*                                                                               *
+* Argument  Type         IO     Description                                     *
+* --------- --------     --     ---------------------------------               *
+* prev      float        I      previous state                                  *
+* measured  float        I      new measured state                              *
+* alpha     float        I      must be btw 0<alpha<1                           *
+*                                                                               *
+* RETURN VALUE: float                                                           *
+*                                                                               *
+********************************************************************************/
+float LowPassFilter(float prev, float measured, float alpha)
+{
     return prev + alpha * (measured - prev);
 }
 
 
-/*===========================================================================*/
-/* set all constant Kalman values (still to add R and Q, R may be a          */
-/* diagonal matrix with 0.2 as coefficient                                   */
-/*===========================================================================*/
-void setKalman(){
+/********************************************************************************
+*                                                                               *
+* FUNCTION NAME: setKalman                                                      *
+*                                                                               *
+* PURPOSE: set all constant Kalman values (still to add R and Q, R may be a     *
+* diagonal matrix with 0.2 as coefficient                                       *
+*                                                                               *
+* ARGUMENT LIST:                                                                *
+*                                                                               *
+* Argument  Type         IO     Description                                     *
+* --------- --------     --     ---------------------------------               *
+*                                                                               *
+* RETURN VALUE: void                                                            *
+*                                                                               *
+********************************************************************************/
+void setKalman()
+{
     k->P=*Create(2,2);
     k->P_p=*Create(2,2);
     k->K=*Create(2,2);
@@ -95,11 +207,24 @@ void setKalman(){
     k[2].R.matrix[0][0]=0.2;    k[2].R.matrix[0][1]=0;    k[2].R.matrix[1][0]=0;    k[2].R.matrix[1][1]=0.2;    //set R
 }
 
-
-/*===========================================================================*/
-/* Using quaterion to calculate yaw,pitch and roll                           */
-/*===========================================================================*/
-void calculateYPR(float *q, float *ypr){
+/********************************************************************************
+*                                                                               *
+* FUNCTION NAME: calculateYPR                                                   *
+*                                                                               *
+* PURPOSE: Using quaterion to calculate yaw,pitch and roll                      *
+*                                                                               *
+* ARGUMENT LIST:                                                                *
+*                                                                               *
+* Argument  Type         IO     Description                                     *
+* --------- --------     --     ---------------------------------               *
+* q         float*       O      Quaternions                                     *
+* ypr       float*       O      Yaw Pitch and Roll                              *
+*                                                                               *
+* RETURN VALUE: void                                                            *
+*                                                                               *
+********************************************************************************/
+void calculateYPR(float *q, float *ypr)
+{
     // calculate gravity vector
     gravity[0] = 2 * (q1*q3 - q0*q2);
     gravity[1] = 2 * (q0*q1 + q2*q3);
@@ -118,11 +243,26 @@ void calculateYPR(float *q, float *ypr){
     euler[2] = atan2(2*q[2]*q[3] - 2*q[0]*q[1], 2*q[0]*q[0] + 2*q[3]*q[3] - 1);
 }
 
-
-/*============================================================================*/
-/* Using quaterion to calculate rotation matrix and acc North, East and Down  */
-/*============================================================================*/
-Matrix *calc_acc_vec(Matrix *a, const float offsetx, const float offsety){
+/********************************************************************************
+*                                                                               *
+* FUNCTION NAME: calc_acc_vec                                                   *
+*                                                                               *
+* PURPOSE: Using quaterion to calculate rotation matrix and                     *
+*              acc North, East and Down                                         *
+*                                                                               *
+* ARGUMENT LIST:                                                                *
+*                                                                               *
+* Argument  Type         IO     Description                                     *
+* --------- --------     --     ---------------------------------               *
+* a         Matrix*      I      Accelerometer data                              *
+* offsetx   const float  I      x axis offset                                   *
+* offsety   const float  I      y axis offset                                   *
+*                                                                               *
+* RETURN VALUE: Matrix*                                                         *
+*                                                                               *
+********************************************************************************/
+Matrix *calc_acc_vec(Matrix *a, const float offsetx, const float offsety)
+{
     Matrix *acc=Create(3, 1);
     Matrix rotation=*Create(3, 3);
 
@@ -161,12 +301,26 @@ Matrix *calc_acc_vec(Matrix *a, const float offsetx, const float offsety){
     return acc;
 }
 
-
-/*===========================================================================*/
-/* computing latitude, longitude and altitude to get                         */
-/* position and velocity                                                     */
-/*===========================================================================*/
-void compute_GPS(float lla[3], float x[3], float v[3]){
+/********************************************************************************
+*                                                                               *
+* FUNCTION NAME: compute_GPS                                                    *
+*                                                                               *
+* PURPOSE: computing latitude, longitude and altitude to get                    *
+*           position and velocity                                               *
+*                                                                               *
+* ARGUMENT LIST:                                                                *
+*                                                                               *
+* Argument  Type         IO     Description                                     *
+* --------- --------     --     ---------------------------------               *
+* lla       float[3]     I      Lat-lon-alt                                     *
+* x         float[3]     O      position                                        *
+* v         float[3]     O      velocity                                        *
+*                                                                               *
+* RETURN VALUE: void                                                            *
+*                                                                               *
+********************************************************************************/
+void compute_GPS(float lla[3], float x[3], float v[3])
+{
     float d_poles=20004500;
     float r_earth=6378388;
     
@@ -213,12 +367,25 @@ void compute_GPS(float lla[3], float x[3], float v[3]){
     last_lla[2]=lla[2];
 }
 
-
-/*============================================================================*/
-/* Using acceleration vector and latlongalt to calculate the velocity         */
-/* passing through the Kalman Filter                                          */
-/*============================================================================*/
-void calculate_velocity(float* velocity, int a){ //passing latlongalt
+/********************************************************************************
+*                                                                               *
+* FUNCTION NAME: compute_GPS                                                    *
+*                                                                               *
+* PURPOSE: Using acceleration vector and latlongalt to calculate the velocity   *
+*               passing through the Kalman Filter                               *
+*                                                                               *
+* ARGUMENT LIST:                                                                *
+*                                                                               *
+* Argument  Type         IO     Description                                     *
+* --------- --------     --     ---------------------------------               *
+* lla       float*       O      velocity                                        *
+* x         float3]      I       lat/long/alt                                   *
+*                                                                               *
+* RETURN VALUE: void                                                            *
+*                                                                               *
+********************************************************************************/
+void calculate_velocity(float* velocity, int a)
+{ 
     float x[3];
     float v[3];
 
