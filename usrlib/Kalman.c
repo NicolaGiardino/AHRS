@@ -113,9 +113,9 @@ void predict(kalman *k, float u)
     
     /* x_p=A*x(n-1) + u_k*b */
     k->x_p=*multiply(&k->A, &k->x);
-    sc_multiply(&k->B, u);
-    sum(&k->x_p, &k->B);
     
+    sum(&k->x_p, m_sc_multiply(&k->B, u));
+   
     /* P_p=A*P_n-1*A^T + Q */
     k->P_p=*multiply(&k->A, &k->P);
     k->P_p=*multiply(&k->P_p, transpose(&k->A));
@@ -145,7 +145,7 @@ void innovation(kalman *k, Matrix *z)
     //y=z_n - H*x_p
     k->y=*multiply(&k->H, &k->x_p);
     subtract(z, &k->y);
-    k->y=*clone(z);
+    k->y=*copy(z);
     
     //S=H*P_p*H_T + R
     k->S=*multiply(&k->H, &k->P_p);
@@ -154,7 +154,7 @@ void innovation(kalman *k, Matrix *z)
     
     //K=P_p*H_T*S^-1
     k->K=*multiply(&k->P_p, transpose(&k->H));
-    k->K=*multiply(&k->K, inversion(&k->S));
+    k->K=*multiply(&k->K, inverse(&k->S));
     
 }
 
