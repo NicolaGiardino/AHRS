@@ -58,25 +58,23 @@
 
 #include <stdio.h>
 #include <math.h>
-#include "matrices.h"
+#include "matrix.h"
 
 /* Kalman Structure   */
 
 typedef struct Kalman 
 {
     float dt;
-    Matrix x;        /* initial state (then previous estimate) */
-    Matrix x_p;                /* next best estimate */
-    Matrix y;                  /* innovation vector */
-    Matrix P;                  /* covariance matrix */
-    Matrix P_p;             /* predicted covariance matrix */
-    Matrix B;                   /* control matrix */
-    Matrix K;                     /* kalman gain */
-    Matrix H;                   /* observation matrix */
-    Matrix R;       /* estimated measurement error covariance */
-    Matrix Q;           /* estimated process error covariance */
-    Matrix A;               /* state transition matrix */
-    Matrix S;               /* innovation covariance */
+    Matrix* x;        /* initial state (then previous estimate) */
+    Matrix* y;                  /* innovation vector */
+    Matrix* P;                  /* covariance matrix */
+    Matrix* B;                   /* control matrix */
+    Matrix* K;                     /* kalman gain */
+    Matrix* H;                   /* observation matrix */
+    Matrix* R;       /* estimated measurement error covariance */
+    Matrix* Q;           /* estimated process error covariance */
+    Matrix* A;               /* state transition matrix */
+    Matrix* S;               /* innovation covariance */
 }kalman;
 
 //int sat;            //number of satellites
@@ -88,13 +86,13 @@ typedef struct Kalman
 /*============================================*/
 /* Kalman state functions prototypes          */
 /*============================================*/
-void  predict     (kalman *, float);
-void  innovation  (kalman *, Matrix *);
-void  update      (kalman *);
+void  vPredict     (kalman *, float);
+void  vInnovation  (kalman *, Matrix *);
+void  vUpdate      (kalman *);
 
 
 /*============================================*/
 /* Kalman main function prototype             */
 /*============================================*/
-void  Kalman_Filter (kalman *, float , Matrix *);
+void  vKalman_Filter (kalman *, float , Matrix *);
 #endif /* Kalman_h */

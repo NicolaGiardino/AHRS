@@ -65,17 +65,18 @@
 
 /* Declare Prototypes */
 
-float  degtorad       (float );							
-float  LowPassFilter  (float , float , float );
-void   calculateYPR   (float *, float *);
+float  fDegtorad       (float );							
+float  fLowPassFilter  (float , float , float );
+void   vCalculateYPR   (float *, float *);
 
 /* the following are to use in this order */
 
-Matrix*  calc_acc_vec        (Matrix *, const float , const float );
-void     setKalman			 ();
-void     compute_GPS		 (float [3], float [3], float [3]);
-void     calculate_velocity  (float *, Matrix *);
-
+Matrix* pxCalc_acc_vec      (Matrix *, const float , const float );
+int 	iCalc_acc_vec		(Matrix *, const float, const float);
+void    vSetup_Kalman			();
+void    vCompute_GPS		(float [3], float [3], float [3]);
+void    vCalculate_velocity (float *, Matrix *);
+void 	vDelete_Kalman		();
 
 
 #endif /* IMU_h */

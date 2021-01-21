@@ -93,7 +93,7 @@
 
 /********************************************************************************
 *                                                                               *
-* FUNCTION NAME: predict                                                        *
+* FUNCTION NAME: vPredict                                                       *
 *                                                                               *
 * PURPOSE: Phase 1 of Kalman Filter, predicts the future                        *
                 state                                                           *
@@ -108,24 +108,33 @@
 * RETURN VALUE: void                                                            *
 *                                                                               *
 ********************************************************************************/
-void predict(kalman *k, float u)
+void vPredict(kalman *k, float u)
 {
-    
+    Matrix *app;
+    Matrix *app2;
+
     /* x_p=A*x(n-1) + u_k*b */
-    k->x_p=*multiply(&k->A, &k->x);
-    
-    sum(&k->x_p, m_sc_multiply(&k->B, u));
-   
+    app = pxMultiply(k->A, k->x);
+    app2 = pxSc_Multiply(k->B, u);
+    iSum(k->x, app, app2);
+    vDestroy(app);
+    vDestroy(app2);
+
     /* P_p=A*P_n-1*A^T + Q */
-    k->P_p=*multiply(&k->A, &k->P);
-    k->P_p=*multiply(&k->P_p, transpose(&k->A));
-    sum(&k->P_p, &k->Q);
-    
+    app = pxMultiply(k->A, k->P);
+    app2 = transpose(k->A);
+    iMultiply(k->P, app, app2);
+    vDestroy(app);
+    vDestroy(app2);
+
+    app = pxCopy(k->P);
+    iSum(k->P, app, k->Q);
+    vDestroy(app);
 }
 
 /********************************************************************************
 *                                                                               *
-* FUNCTION NAME: innovation                                                     *
+* FUNCTION NAME: vInnovation                                                    *
 *                                                                               *
 * PURPOSE: Phase 2 of Kalman Filter, innovates the current                      *
                 state                                                           *
@@ -140,27 +149,46 @@ void predict(kalman *k, float u)
 * RETURN VALUE: void                                                            *
 *                                                                               *
 ********************************************************************************/
-void innovation(kalman *k, Matrix *z)
+void vInnovation(kalman *k, Matrix *z)
 {
-    //y=z_n - H*x_p
-    k->y=*multiply(&k->H, &k->x_p);
-    subtract(z, &k->y);
-    k->y=*copy(z);
-    
-    //S=H*P_p*H_T + R
-    k->S=*multiply(&k->H, &k->P_p);
-    k->S=*multiply(&k->S, transpose(&k->H));
-    sum(&k->S, &k->R);
-    
-    //K=P_p*H_T*S^-1
-    k->K=*multiply(&k->P_p, transpose(&k->H));
-    k->K=*multiply(&k->K, inverse(&k->S));
-    
+
+    Matrix *app;
+    Matrix *app2;
+
+    /* y=z_n - H*x_p */
+    iMultiply(k->y , k->H, k->x);
+    app = pxCopy(k->y);
+    iSubtract(k->y, z, app);
+    vDestroy(app);
+
+    /* S=H*P_p*H_T + R */
+    iMultiply(k->S, k->H, k->P);
+
+    app = pxCopy(k->S);
+    app2 = transpose(k->H);
+    iMultiply(k->S, app, app2);
+    vDestroy(app);
+    vDestroy(app2);
+
+    app=pxCopy(k->S);
+    iSum(k->S, app, k->R);
+    vDestroy(app);
+
+    /* K=P_p*H_T*S^-1 */
+    app = transpose(k->H);
+    iMultiply(k->K, k->P, app);
+    vDestroy(app);
+
+    app = pxCopy(k->K);
+    app2 = pxInverse(k->S);
+    iMultiply(k->K, app, app2);
+    vDestroy(app);
+    vDestroy(app2);
 }
 
 /********************************************************************************
 *                                                                               *
-* FUNCTION NAME: update                                                         *
+* FUNCTION NAME: vUpdate                                                        *
 *                                                                               *
 * PURPOSE: Phase 3 of Kalman Filter, updates the current                        *
                 state                                                           *
@@ -174,17 +202,25 @@ void innovation(kalman *k, Matrix *z)
 * RETURN VALUE: void                                                            *
 *                                                                               *
 ********************************************************************************/
-void update(kalman *k)
+void vUpdate(kalman *k)
 {
-    Matrix I=*identity(2);
-    //x_n=x_p+Ky
-    add(&k->x_p, multiply(&k->K, &k->y));
-    k->x=*copy(&k->x_p);
-    
-    //P=(I-K*H)*P_p
-    subtract(&I, multiply(&k->K, &k->H));
-    k->P=*multiply(&I, &k->P_p);
-    
+    Matrix *I = pxIdentity(2);
+    Matrix *app;
+    Matrix *app2;
+
+    /* x_n=x_p+Ky */
+    app = pxCopy(k->x);
+    app2 = pxMultiply(k->K, k->y);
+    iSum(k->x, app, app2);
+    vDestroy(app);
+    vDestroy(app2);
+
+    /* P=(I-K*H)*P_p */
+    app = pxMultiply(k->K, k->H);
+    app2 = pxSubtract(I, app);
+    vDestroy(app);
+    iMultiply(k->P, app2, k->P);
+    vDestroy(app2);
 }
 
 /********************************************************************************
@@ -204,9 +240,9 @@ void update(kalman *k)
 * RETURN VALUE: void                                                            *
 *                                                                               *
 ********************************************************************************/
-void Kalman_Filter(kalman *k, float a, Matrix *GPS)
+void vKalman_Filter(kalman *k, float a, Matrix *GPS)
 {
-    predict(k, a);
-    innovation(k, GPS);
-    update(k);
+    vPredict(k, a);
+    vInnovation(k, GPS);
+    vUpdate(k);
 }
