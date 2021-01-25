@@ -472,16 +472,15 @@ void vCalculate_velocity(float* velocity, int a)
 
 
     //calculating rotation matrix
-    rotation.matrix[0][0] = q0*q0 + q1*q1 - q2*q2 - q3*q3;
-    rotation.matrix[1][0] = 2*(q1*q2 - q0*q3);
-    rotation.matrix[2][0] = 2*(q1*q3 + q0*q2);
-    rotation.matrix[0][1] = 2*(q1*q2 + q0*q3);
-    rotation.matrix[1][1] = q0*q0 - q1*q1 + q2*q2 - q3*q3;
-    rotation.matrix[2][1] = 2*(q1*q3 - q0*q1);
-    rotation.matrix[0][2] = 2*(q1*q3 - q0*q2);
-    rotation.matrix[1][2] = 2*(q2*q3 + q0*q1);
-    rotation.matrix[2][2] = q0*q0 - q1*q1 - q2*q2 + q3*q3;
-
+    rotation->matrix[0][0] = q0 * q0 + q1 * q1 - q2 * q2 - q3 * q3;
+    rotation->matrix[1][0] = 2 * (q1 * q2 - q0 * q3);
+    rotation->matrix[2][0] = 2 * (q1 * q3 + q0 * q2);
+    rotation->matrix[0][1] = 2 * (q1 * q2 + q0 * q3);
+    rotation->matrix[1][1] = q0 * q0 - q1 * q1 + q2 * q2 - q3 * q3;
+    rotation->matrix[2][1] = 2 * (q1 * q3 - q0 * q1);
+    rotation->matrix[0][2] = 2 * (q1 * q3 - q0 * q2);
+    rotation->matrix[1][2] = 2 * (q2 * q3 + q0 * q1);
+    rotation->matrix[2][2] = q0 * q0 - q1 * q1 - q2 * q2 + q3 * q3;
 
     //calculating acceleration vector
     //rotation*g=acc;       inverse rotation;       invrot*acc=a;
